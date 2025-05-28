@@ -92,6 +92,12 @@ class GuideServiceTest {
         when(guideRepository.existsByTitle("Nueva Guía")).thenReturn(false);
         when(lawyerService.getLawyerFromUser(user)).thenReturn(lawyer);
 
+        when(guideRepository.save(any(Guide.class))).thenAnswer(invocation -> {
+            Guide saved = invocation.getArgument(0);
+            saved.setId(UUID.randomUUID());
+            return saved;
+        });
+
         GuideReponseDTO dto = guideService.publishGuide(request, user);
 
         assertEquals("Nueva Guía", dto.getTitle());
