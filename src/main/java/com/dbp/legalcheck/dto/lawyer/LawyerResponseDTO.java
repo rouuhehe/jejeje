@@ -6,8 +6,10 @@ import com.dbp.legalcheck.common.enums.LawyerSpecialization;
 import com.dbp.legalcheck.domain.lawyer.Lawyer;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class LawyerResponseDTO {
     private String firstName;
     private String lastName;
