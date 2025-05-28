@@ -7,35 +7,30 @@ import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
     private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
 
-    public void sendSignInEmail(String to, String fullName) {
+    public void sendSignInEmail(String to, String subject, String templateName, Context context) {
+        MimeMessage message = mailSender.createMimeMessage();
+
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setTo(to);
-            helper.setSubject("Bienvenido a LegalCheck!");
+            helper.setSubject(subject);
 
-            String content = """
-                    <html>
-                    <body>
-                        <h1>¡Hola %s!</h1>
-                        <p>Gracias por registrarte en LegalCheck.</p>
-                        <p>Estamos felices de tenerte como parte de nuestra comunidad.</p>
-                    </body>
-                    </html>
-                    """.formatted(fullName);
+            String htmlContent = templateEngine.process(templateName, context);
+            helper.setText(htmlContent, true);
 
-            helper.setText(content, true);
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new IllegalStateException("No se pudo enviar el email", e);
+            throw new RuntimeException("Failed to send email", e);
         }
     }
 }

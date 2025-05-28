@@ -12,7 +12,7 @@ public class EmailApplicationService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public void sendSignInEmail(User createdUser) {
-        applicationEventPublisher.publishEvent(new SignInEmailEvent());
+    public void sendSignInEmail(User user) {
+        applicationEventPublisher.publishEvent(new SignInEmailEvent(user));
     }
 }

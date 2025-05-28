@@ -3,7 +3,6 @@ package com.dbp.legalcheck.auth.application;
 import com.dbp.legalcheck.auth.domain.AuthenticationService;
 import com.dbp.legalcheck.auth.dto.AuthLoginDTO;
 import com.dbp.legalcheck.auth.dto.AuthResponseDTO;
-import com.dbp.legalcheck.domain.email.EmailApplicationService;
 import com.dbp.legalcheck.domain.user.User;
 import com.dbp.legalcheck.domain.user.UserService;
 import com.dbp.legalcheck.dto.user.RegisterUserDTO;
@@ -31,7 +30,6 @@ public class AuthController {
     private final AuthenticationService authenticationService;
     private final UserService userService;
     private final ModelMapper modelMapper;
-    private final EmailApplicationService emailApplicationService;
 
     @PostMapping("/login")
     public AuthResponseDTO login(@Valid @RequestBody AuthLoginDTO request) {
@@ -41,7 +39,7 @@ public class AuthController {
     @PostMapping("/register")
     public UserResponseDTO register(@Valid @RequestBody RegisterUserDTO request) {
         User createdUser = userService.createUser(request);
-        emailApplicationService.sendSignInEmail(createdUser);
+        // TODO: trigger send email event
         return modelMapper.map(createdUser, UserResponseDTO.class);
     }
 

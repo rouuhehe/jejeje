@@ -3,11 +3,10 @@ package com.dbp.legalcheck.listener;
 import com.dbp.legalcheck.domain.email.EmailService;
 import com.dbp.legalcheck.event.SignInEmailEvent;
 import lombok.RequiredArgsConstructor;
-import lombok.var;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import com.dbp.legalcheck.domain.user.User
+import org.thymeleaf.context.Context;
 
 
 @Component
@@ -20,8 +19,16 @@ public class EmailListener {
     @Async
     public void handleSignInEmailEvent(SignInEmailEvent event) {
         var user = event.getUser();
-        emailService.sendSignInEmail(user.getEmail(), user.getFirstName() + " " + user.getLastName());
+
+        Context context = new Context();
+        context.setVariable("fullName", user.getFirstName() + " " + user.getLastName());
+        context.setVariable("email", user.getEmail());
+
+        emailService.sendSignInEmail(
+                user.getEmail(),
+                "¡Bienvenido a LegalCheck!",
+                "sign-in-confirmation",
+                context
+        );
     }
-
-
 }
