@@ -16,6 +16,10 @@ import com.dbp.legalcheck.domain.chatSession.ChatSession;
 import com.dbp.legalcheck.domain.chatSession.ChatSessionService;
 import com.dbp.legalcheck.domain.message.Message;
 import com.dbp.legalcheck.domain.user.User;
+import com.dbp.legalcheck.dto.chatSession.SessionResponseDTO;
+import com.dbp.legalcheck.dto.message.MessageResponseDTO;
+import com.dbp.legalcheck.exception.ai.AiNoResponseException;
+import com.dbp.legalcheck.exception.chatSession.ClosedSessionException;
 import com.dbp.legalcheck.exception.chatSession.SessionNoOwnerException;
 import com.dbp.legalcheck.exception.chatSession.SessionNotFoundException;
 
@@ -50,11 +54,6 @@ public class AiService {
         sessionService.saveMessage(session, MessageRole.USUARIO, prompt);
 
         List<ChatRequestMessage> messages = sessionService.getSessionMessages(user, sessionId, prompt);
-
-        ChatCompletionsClient client = new ChatCompletionsClientBuilder()
-                .credential(new AzureKeyCredential(config.getToken()))
-                .endpoint(config.getEndpoint())
-                .buildClient();
 
         ChatCompletionsOptions options = new ChatCompletionsOptions(messages);
         options.setModel(config.getModel());

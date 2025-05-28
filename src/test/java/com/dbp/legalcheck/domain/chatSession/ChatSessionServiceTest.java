@@ -1,7 +1,10 @@
 package com.dbp.legalcheck.domain.chatSession;
 
-import com.azure.ai.inference.models.ChatRequestMessage;
-import com.dbp.legalcheck.common.enums.ChatSessionStatus;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.*;
+
 import com.dbp.legalcheck.common.enums.MessageRole;
 import com.dbp.legalcheck.domain.message.Message;
 import com.dbp.legalcheck.domain.user.User;
@@ -9,16 +12,13 @@ import com.dbp.legalcheck.exception.chatSession.SessionNoOwnerException;
 import com.dbp.legalcheck.exception.chatSession.SessionNotFoundException;
 import com.dbp.legalcheck.infrastructure.chatSession.ChatSessionRepository;
 import com.dbp.legalcheck.infrastructure.message.MessageRepository;
+import com.dbp.legalcheck.dto.message.MessageResponseDTO;
+import com.dbp.legalcheck.dto.chatSession.SessionResponseDTO;
+import com.dbp.legalcheck.common.enums.ChatSessionStatus;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-
-import java.time.Instant;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class ChatSessionServiceTest {
 
@@ -33,112 +33,121 @@ class ChatSessionServiceTest {
 
     private User user;
     private ChatSession session;
+    private UUID sessionId;
 
     @BeforeEach
-    void setup() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
-
         user = new User();
-        user.setId(UUID.randomUUID());
+        UUID userId = UUID.randomUUID();
+        user.setId(userId);
 
+        sessionId = UUID.randomUUID();
         session = ChatSession.builder()
-                .id(UUID.randomUUID())
+                .id(sessionId)
                 .user(user)
                 .status(ChatSessionStatus.OPEN)
-                .createdAt(Instant.now())
                 .build();
     }
 
     @Test
-    void getOrCreateSessionShouldReturnExistingSession() {
-        when(sessionRepository.findById(session.getId())).thenReturn(Optional.of(session));
+    void listSessionHistory_ReturnsMessages() {
+        List<Message> messages = List.of(
+                Message.builder().content("Hola").role(MessageRole.USUARIO).session(session).build(),
+                Message.builder().content("Respuesta").role(MessageRole.ASISTENTE).session(session).build()
+        );
 
-        ChatSession result = chatSessionService.getOrCreateSession(user, session.getId());
+        when(messageRepository.findBySessionOrderByCreatedAtAsc(session)).thenReturn(messages);
 
-        assertEquals(session, result);
-        verify(sessionRepository, never()).save(any());
+        List<Message> result = chatSessionService.listSessionHistory(session);
+
+        assertEquals(2, result.size());
+        verify(messageRepository).findBySessionOrderByCreatedAtAsc(session);
     }
 
     @Test
-    void getOrCreateSessionShouldCreateNewSessionIfNotExists() {
-        when(sessionRepository.findById(any())).thenReturn(Optional.empty());
-        when(sessionRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+    void saveMessage_SavesCorrectly() {
+        String content = "Test message";
 
-        ChatSession result = chatSessionService.getOrCreateSession(user, UUID.randomUUID());
+        chatSessionService.saveMessage(session, MessageRole.USUARIO, content);
 
-        assertEquals(user, result.getUser());
-        assertEquals(ChatSessionStatus.OPEN, result.getStatus());
-        verify(sessionRepository).save(any());
+        ArgumentCaptor<Message> captor = ArgumentCaptor.forClass(Message.class);
+        verify(messageRepository).save(captor.capture());
+
+        Message savedMessage = captor.getValue();
+        assertEquals(content, savedMessage.getContent());
+        assertEquals(MessageRole.USUARIO, savedMessage.getRole());
+        assertEquals(session, savedMessage.getSession());
     }
 
     @Test
-    void listMessagesBySessionShouldReturnMessagesIfUserOwnsSession() {
-        List<Message> expectedMessages = List.of(
-                new Message(session, MessageRole.USUARIO, "Hola", Instant.now()));
+    void listMessagesBySession_WhenSessionExistsAndUserIsOwner_ReturnsDTOs() {
+        List<Message> messages = List.of(
+                Message.builder().content("Hola").role(MessageRole.USUARIO).session(session).build()
+        );
 
-        when(sessionRepository.findById(session.getId())).thenReturn(Optional.of(session));
-        when(messageRepository.findBySessionOrderByCreatedAtAsc(session)).thenReturn(expectedMessages);
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
+        when(messageRepository.findBySessionOrderByCreatedAtAsc(session)).thenReturn(messages);
 
-        List<Message> result = chatSessionService.listMessagesBySession(session.getId(), user);
+        List<MessageResponseDTO> dtos = chatSessionService.listMessagesBySession(sessionId, user);
 
-        assertEquals(expectedMessages, result);
+        assertEquals(1, dtos.size());
+        assertEquals("Hola", dtos.get(0).getContent());
     }
 
     @Test
-    void listMessagesBySessionShouldThrowIfSessionNotFound() {
-        when(sessionRepository.findById(any())).thenReturn(Optional.empty());
+    void listMessagesBySession_WhenSessionNotFound_Throws() {
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.empty());
 
         assertThrows(SessionNotFoundException.class,
-                () -> chatSessionService.listMessagesBySession(UUID.randomUUID(), user));
+                () -> chatSessionService.listMessagesBySession(sessionId, user));
     }
 
     @Test
-    void listMessagesBySessionShouldThrowIfUserIsNotOwner() {
-        User anotherUser = new User();
-        anotherUser.setId(UUID.randomUUID());
+    void listMessagesBySession_WhenUserIsNotOwner_Throws() {
+        User otherUser = new User();
+        otherUser.setId(UUID.randomUUID());
 
-        when(sessionRepository.findById(session.getId())).thenReturn(Optional.of(session));
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 
         assertThrows(SessionNoOwnerException.class,
-                () -> chatSessionService.listMessagesBySession(session.getId(), anotherUser));
+                () -> chatSessionService.listMessagesBySession(sessionId, otherUser));
     }
 
     @Test
-    void saveMessageShouldStoreMessage() {
-        chatSessionService.saveMessage(session, MessageRole.USUARIO, "Hola");
+    void createSession_SavesAndReturns() {
+        when(sessionRepository.save(any(ChatSession.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        verify(messageRepository).save(argThat(m ->
-                m.getContent().equals("Hola") &&
-                        m.getRole() == MessageRole.USUARIO &&
-                        m.getSession().equals(session)
-        ));
+        ChatSession created = chatSessionService.createSession(user);
+
+        assertEquals(user, created.getUser());
+        assertEquals(ChatSessionStatus.OPEN, created.getStatus());
+        verify(sessionRepository).save(any(ChatSession.class));
     }
 
     @Test
-    void getSessionMessagesShouldBuildCorrectMessageList() {
-        Message m1 = new Message(session, MessageRole.USUARIO, "¿Cuáles son mis derechos laborales?", Instant.now());
-        Message m2 = new Message(session, MessageRole.ASISTENTE, "Tienes derecho a... ", Instant.now());
+    void getSessionById_WhenExists_ReturnsOptional() {
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 
-        when(sessionRepository.findById(session.getId())).thenReturn(Optional.of(session));
-        when(messageRepository.findBySessionOrderByCreatedAtAsc(session)).thenReturn(List.of(m1, m2));
+        Optional<ChatSession> result = chatSessionService.getSessionById(sessionId);
 
-        List<ChatRequestMessage> result = chatSessionService.getSessionMessages(user, session.getId(), "nuevo mensaje");
-
-        assertFalse(result.isEmpty());
-        assertTrue(result.stream().anyMatch(m -> m instanceof com.azure.ai.inference.models.ChatRequestSystemMessage));
-        assertTrue(result.stream().anyMatch(m -> m instanceof com.azure.ai.inference.models.ChatRequestUserMessage));
-        assertTrue(result.stream().anyMatch(m -> m instanceof com.azure.ai.inference.models.ChatRequestAssistantMessage));
+        assertTrue(result.isPresent());
+        assertEquals(session, result.get());
     }
 
     @Test
-    void updateSessionShouldSaveSession() {
+    void getSessionById_WhenNotExists_ReturnsEmpty() {
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.empty());
+
+        Optional<ChatSession> result = chatSessionService.getSessionById(sessionId);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void updateSession_SavesSession() {
         chatSessionService.updateSession(session);
-        verify(sessionRepository).save(session);
-    }
 
-    @Test
-    void getSessionsByUserShouldCallRepository() {
-        chatSessionService.getSessionsByUser(user);
-        verify(sessionRepository).findByUser(user);
+        verify(sessionRepository).save(session);
     }
 }

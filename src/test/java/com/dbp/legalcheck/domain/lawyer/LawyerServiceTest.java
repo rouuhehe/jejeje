@@ -9,6 +9,7 @@ import com.dbp.legalcheck.exception.lawyer.LawyerAlreadyExistsException;
 import com.dbp.legalcheck.exception.lawyer.LawyerNotFoundException;
 import com.dbp.legalcheck.exception.lawyer.UserNotLawyerException;
 import com.dbp.legalcheck.infrastructure.lawyer.LawyerRepository;
+import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;

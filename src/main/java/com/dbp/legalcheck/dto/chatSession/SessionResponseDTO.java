@@ -7,8 +7,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class SessionResponseDTO {
     private UUID id;
     private Instant createdAt;

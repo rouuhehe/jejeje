@@ -7,8 +7,10 @@ import com.dbp.legalcheck.common.enums.MessageRole;
 import com.dbp.legalcheck.domain.message.Message;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class MessageResponseDTO {
     private UUID id;
     private MessageRole role;
