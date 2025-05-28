@@ -45,4 +45,11 @@ public class Message {
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
+
+    public Message(ChatSession session, MessageRole role, String content, Instant createdAt) {
+        this.session = session;
+        this.role = role;
+        this.content = content;
+        this.createdAt = createdAt;
+    }
 }
