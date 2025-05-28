@@ -8,24 +8,22 @@ import com.dbp.legalcheck.common.enums.ChatSessionStatus;
 import com.dbp.legalcheck.domain.message.Message;
 import com.dbp.legalcheck.domain.user.User;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 
 @Entity
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChatSession {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -36,6 +34,7 @@ public class ChatSession {
     private User user;
 
     @CreationTimestamp
+    @Column(updatable = false, nullable = false)
     private Instant createdAt;
 
     @Enumerated(EnumType.STRING)
