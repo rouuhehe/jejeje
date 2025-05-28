@@ -17,7 +17,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-    public void sendSignInEmail(String to, String subject, String templateName, Context context) {
+    public void sendEmail(String to, String subject, String templateName, Context context) {
         MimeMessage message = mailSender.createMimeMessage();
 
         try {
