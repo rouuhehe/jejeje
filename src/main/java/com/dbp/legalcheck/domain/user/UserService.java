@@ -45,7 +45,10 @@ public class UserService {
 
     public User verifyUser(User user) {
         user.setVerificationId(null);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        emailApplicationService.sendWelcomeEmail(savedUser);
+
+        return savedUser;
     }
 
     public User createUser(RegisterUserDTO regist) {

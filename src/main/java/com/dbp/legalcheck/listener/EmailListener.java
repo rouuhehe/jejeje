@@ -25,9 +25,9 @@ public class EmailListener {
         context.setVariable("email", user.getEmail());
         context.setVariable("verId", user.getVerificationId());
 
-        emailService.sendSignInEmail(
+        emailService.sendEmail(
                 user.getEmail(),
-                "¡Bienvenido a LegalCheck!",
+                "Verificacion",
                 "sign-in-confirmation",
                 context
         );
