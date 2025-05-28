@@ -34,7 +34,7 @@ class LawyerServiceTest {
     }
 
     @Test
-    void getLawyerFromUser_success() {
+    void getLawyerFromUserSuccess() {
         User user = new User();
         user.setId(UUID.randomUUID());
 
@@ -49,7 +49,7 @@ class LawyerServiceTest {
     }
 
     @Test
-    void getLawyerFromUser_notFound_throwsUserNotLawyerException() {
+    void getLawyerFromUserNotFoundThrowsUserNotLawyerException() {
         User user = new User();
         user.setId(UUID.randomUUID());
 
@@ -59,7 +59,7 @@ class LawyerServiceTest {
     }
 
     @Test
-    void listLawyers_success() {
+    void listLawyersSuccess() {
         Lawyer lawyer = new Lawyer();
         lawyer.setFirstName("Test");
 
@@ -72,7 +72,7 @@ class LawyerServiceTest {
     }
 
     @Test
-    void getLawyerById_success() {
+    void getLawyerByIdSuccess() {
         UUID id = UUID.randomUUID();
         Lawyer lawyer = new Lawyer();
         lawyer.setId(id);
@@ -86,7 +86,7 @@ class LawyerServiceTest {
     }
 
     @Test
-    void getLawyerById_notFound_throwsException() {
+    void getLawyerByIdNotFoundThrowsException() {
         UUID id = UUID.randomUUID();
         when(lawyerRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -94,7 +94,7 @@ class LawyerServiceTest {
     }
 
     @Test
-    void registerLawyer_success() {
+    void registerLawyerSuccess() {
         LawyerRequestDTO dto = new LawyerRequestDTO();
         dto.setEmail("test@lawyer.com");
 
@@ -110,7 +110,7 @@ class LawyerServiceTest {
     }
 
     @Test
-    void registerLawyer_alreadyExists_throwsException() {
+    void registerLawyerAlreadyExistsThrowsException() {
         LawyerRequestDTO dto = new LawyerRequestDTO();
         dto.setEmail("duplicate@lawyer.com");
 
@@ -120,7 +120,7 @@ class LawyerServiceTest {
     }
 
     @Test
-    void updateLawyer_success_adminUser() {
+    void updateLawyerSuccessAdminUser() {
         UUID id = UUID.randomUUID();
         User admin = new User();
         admin.setId(UUID.randomUUID());
@@ -141,7 +141,7 @@ class LawyerServiceTest {
     }
 
     @Test
-    void updateLawyer_success_ownerUser() {
+    void updateLawyerSuccessOwnerUser() {
         UUID id = UUID.randomUUID();
         User user = new User();
         user.setId(id);
@@ -162,7 +162,7 @@ class LawyerServiceTest {
     }
 
     @Test
-    void updateLawyer_insufficientPermissions_throwsException() {
+    void updateLawyerInsufficientPermissionsThrowsException() {
         UUID id = UUID.randomUUID();
         User otherUser = new User();
         otherUser.setId(UUID.randomUUID());
@@ -178,7 +178,7 @@ class LawyerServiceTest {
     }
 
     @Test
-    void deleteLawyer_success_adminUser() {
+    void deleteLawyerSuccessAdminUser() {
         UUID id = UUID.randomUUID();
         User admin = new User();
         admin.setId(UUID.randomUUID());
@@ -194,7 +194,7 @@ class LawyerServiceTest {
     }
 
     @Test
-    void deleteLawyer_insufficientPermissions_throwsException() {
+    void deleteLawyerInsufficientPermissionsThrowsException() {
         UUID id = UUID.randomUUID();
         User user = new User();
         user.setId(UUID.randomUUID());
@@ -210,14 +210,12 @@ class LawyerServiceTest {
     }
 
     @Test
-    void deleteLawyer_lawyerNotFound_throwsException() {
+    void deleteLawyerLawyerNotFoundThrowsException() {
         UUID id = UUID.randomUUID();
         User user = new User();
         user.setId(id);
         user.setRole(UserRole.ADMINISTRADOR);
-
         when(lawyerRepository.findById(id)).thenReturn(Optional.empty());
-
         assertThrows(LawyerNotFoundException.class,
                 () -> lawyerService.deleteLawyer(id, user));
     }

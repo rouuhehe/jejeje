@@ -25,6 +25,8 @@ import lombok.Data;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Guide {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

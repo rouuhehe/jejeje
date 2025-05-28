@@ -7,8 +7,10 @@ import com.dbp.legalcheck.common.enums.GuideType;
 import com.dbp.legalcheck.domain.guide.Guide;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class GuideReponseDTO {
     private UUID authorId;
     private String title;
