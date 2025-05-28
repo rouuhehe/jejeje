@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class GuideReponseDTO {
+    private UUID id;
     private UUID authorId;
     private String title;
     private String content;
@@ -20,7 +21,10 @@ public class GuideReponseDTO {
     private Instant updatedAt;
 
     public GuideReponseDTO(Guide guide) {
-        this.authorId = guide.getAuthor().getId();
+        this.id = guide.getId();
+        if (guide.getAuthor() != null) {
+            this.authorId = guide.getAuthor().getId();
+        }
         this.title = guide.getTitle();
         this.content = guide.getContent();
         this.createdAt = guide.getCreatedAt();

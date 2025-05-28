@@ -49,6 +49,7 @@ public class LawyerService {
         if (lawyerRepository.existsByEmail(request.getEmail())) {
             throw new LawyerAlreadyExistsException();
         }
+
         Lawyer lawyer = modelMapper.map(request, Lawyer.class);
         Lawyer saved = lawyerRepository.save(lawyer);
         return modelMapper.map(saved, LawyerResponseDTO.class);
@@ -63,6 +64,7 @@ public class LawyerService {
                 !lawyer.getId().equals(user.getId())) {
             throw new InsufficientPermissionsException();
         }
+        lawyerRepository.delete(lawyer);
 
         modelMapper.map(request, lawyer);
         return modelMapper.map(lawyerRepository.save(lawyer), LawyerResponseDTO.class);

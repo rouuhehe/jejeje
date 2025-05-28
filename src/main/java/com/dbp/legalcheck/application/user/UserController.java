@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
     private final UserService userService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping
     public List<ListedUserDTO> listUsers() {
         return userService.list();
@@ -35,7 +35,7 @@ public class UserController {
         return userService.getUserInfo(user);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/{id}")
     public User getUserById(@PathVariable UUID id) {
         return userService.getUserById(id)

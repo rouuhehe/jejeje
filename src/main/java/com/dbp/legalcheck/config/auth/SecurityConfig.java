@@ -43,14 +43,14 @@ public class SecurityConfig {
     @Bean
     public static RoleHierarchy roleHierarchy() {
         return RoleHierarchyImpl
-                .fromHierarchy("ROLE_ADMINISTRADOR > ROLE_ABOGADO \n ROLE_ABOGADO > ROLE_USUARIO");
+                .fromHierarchy("ADMINISTRADOR > ABOGADO \n ABOGADO > USUARIO");
     }
 
     @Bean
     public static MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
         DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
         expressionHandler.setRoleHierarchy(roleHierarchy);
-        expressionHandler.setDefaultRolePrefix("ROLE_");
+        expressionHandler.setDefaultRolePrefix("");
         return expressionHandler;
     }
 

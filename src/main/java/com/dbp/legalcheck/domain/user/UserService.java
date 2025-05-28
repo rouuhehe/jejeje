@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.dbp.legalcheck.common.enums.UserRole;
-import com.dbp.legalcheck.domain.email.EmailApplicationService;
 import com.dbp.legalcheck.dto.user.ListedUserDTO;
 import com.dbp.legalcheck.dto.user.RegisterUserDTO;
 import com.dbp.legalcheck.exception.user.EmailConflictException;
@@ -24,7 +23,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
-    private final EmailApplicationService emailApplicationService;
 
     // GET /api/users/{id}
     public Optional<User> getUserById(UUID id) {
@@ -45,10 +43,7 @@ public class UserService {
 
     public User verifyUser(User user) {
         user.setVerificationId(null);
-        User savedUser = userRepository.save(user);
-        emailApplicationService.sendWelcomeEmail(savedUser);
-
-        return savedUser;
+        return userRepository.save(user);
     }
 
     public User createUser(RegisterUserDTO regist) {
@@ -59,11 +54,7 @@ public class UserService {
         User user = modelMapper.map(regist, User.class);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setVerificationId(UUID.randomUUID());
-
-        User savedUser = userRepository.save(user);
-        emailApplicationService.sendSignInEmail(savedUser);
-
-        return savedUser;
+        return userRepository.save(user);
     }
 
     public User updateUserRole(User user, UserRole role) {

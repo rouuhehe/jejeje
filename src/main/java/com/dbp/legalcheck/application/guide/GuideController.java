@@ -36,13 +36,7 @@ public class GuideController {
         return guideService.listAllGuides();
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/{id}")
-    public GuideReponseDTO getGuideById(@PathVariable UUID id) {
-        return guideService.getGuideById(id);
-    }
-
-    @PreAuthorize("hasRole('LAWYER')")
+    @PreAuthorize("hasRole('ABOGADO')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public GuideReponseDTO publishGuide(@Valid @RequestBody GuideRequestDTO guideDTO,
@@ -50,14 +44,20 @@ public class GuideController {
         return guideService.publishGuide(guideDTO, user);
     }
 
-    @PreAuthorize("hasRole('LAWYER')")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{id}")
+    public GuideReponseDTO getGuideById(@PathVariable UUID id) {
+        return guideService.getGuideById(id);
+    }
+
+    @PreAuthorize("hasRole('ABOGADO')")
     @PutMapping("/{id}")
     public GuideReponseDTO editGuide(@PathVariable UUID id, @Valid @RequestBody GuideRequestDTO guideDTO,
             @AuthenticationPrincipal User user) {
         return guideService.editGuide(id, guideDTO, user);
     }
 
-    @PreAuthorize("hasRole('LAWYER')")
+    @PreAuthorize("hasRole('ABOGADO')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteGuide(@PathVariable UUID id, @AuthenticationPrincipal User user) {

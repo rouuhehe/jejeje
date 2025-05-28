@@ -37,7 +37,7 @@ public class GuideService {
         Guide guide = guideRepository.findById(id)
                 .orElseThrow(GuideNotFoundException::new);
 
-        return modelMapper.map(guide, GuideReponseDTO.class);
+        return new GuideReponseDTO(guide);
     }
 
     // POST /api/guides
@@ -48,10 +48,14 @@ public class GuideService {
         }
 
         Guide newGuide = modelMapper.map(request, Guide.class);
-        newGuide.setAuthor(
-                lawyerService.getLawyerFromUser(user));
 
-        return new GuideReponseDTO(newGuide);
+        if (!user.getRole().equals(UserRole.ADMINISTRADOR)) {
+            newGuide.setAuthor(
+                    lawyerService.getLawyerFromUser(user));
+        }
+
+        return new GuideReponseDTO(
+                guideRepository.save(newGuide));
     }
 
     // PUT /api/guides/{id}
@@ -59,8 +63,12 @@ public class GuideService {
         Guide guide = guideRepository.findById(id)
                 .orElseThrow(GuideNotFoundException::new);
 
-        if (!guide.getAuthor().getId().equals(user.getId()) &&
-                !user.getRole().equals(UserRole.ADMINISTRADOR)) {
+        if (user.getRole().equals(UserRole.ADMINISTRADOR)) {
+            modelMapper.map(request, guide);
+            return new GuideReponseDTO(guideRepository.save(guide));
+        }
+
+        if (!guide.getAuthor().getId().equals(user.getId())) {
             throw new UserNotAuthorException();
         }
 
@@ -73,8 +81,12 @@ public class GuideService {
         Guide guide = guideRepository.findById(id)
                 .orElseThrow(GuideNotFoundException::new);
 
-        if (!user.getRole().equals(UserRole.ADMINISTRADOR) &&
-                !guide.getAuthor().getId().equals(user.getId())) {
+        if (user.getRole().equals(UserRole.ADMINISTRADOR)) {
+            guideRepository.delete(guide);
+            return;
+        }
+
+        if (!guide.getAuthor().getId().equals(user.getId())) {
             throw new InsufficientPermissionsException();
         }
 

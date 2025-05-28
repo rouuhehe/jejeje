@@ -30,6 +30,13 @@ import lombok.RequiredArgsConstructor;
 public class LawyerController {
     private final LawyerService lawyerService;
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public LawyerResponseDTO registerLawyer(@Valid @RequestBody LawyerRequestDTO lawyerDTO) {
+        return lawyerService.registerLawyer(lawyerDTO);
+    }
+
     @PreAuthorize("isAuthenticated()")
     @GetMapping
     public List<LawyerResponseDTO> listLawyers() {
@@ -42,21 +49,14 @@ public class LawyerController {
         return lawyerService.getLawyerById(id);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public LawyerResponseDTO registerLawyer(@Valid @RequestBody LawyerRequestDTO lawyerDTO) {
-        return lawyerService.registerLawyer(lawyerDTO);
-    }
-
-    @PreAuthorize("hasRole('LAWYER')")
+    @PreAuthorize("hasRole('ABOGADO')")
     @PutMapping("/{id}")
     public LawyerResponseDTO updateLawyer(@PathVariable UUID id, @Valid @RequestBody LawyerRequestDTO lawyerDTO,
             @AuthenticationPrincipal User user) {
         return lawyerService.updateLawyer(id, lawyerDTO, user);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLawyer(@PathVariable UUID id, @AuthenticationPrincipal User user) {
