@@ -8,6 +8,8 @@ import com.dbp.legalcheck.common.enums.ChatSessionStatus;
 import com.dbp.legalcheck.domain.message.Message;
 import com.dbp.legalcheck.domain.user.User;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.CascadeType;
@@ -23,10 +25,12 @@ import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Data;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Data
 @Builder
-public class ChatSession
+public class ChatSession {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
