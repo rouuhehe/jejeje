@@ -67,17 +67,4 @@ public class LawyerService {
         modelMapper.map(request, lawyer);
         return modelMapper.map(lawyerRepository.save(lawyer), LawyerResponseDTO.class);
     }
-
-    // DELETE /api/lawyers/{id}
-    public void deleteLawyer(UUID id, User user) {
-        Lawyer lawyer = lawyerRepository.findById(id)
-                .orElseThrow(LawyerNotFoundException::new);
-
-        if (!user.getRole().equals(UserRole.ADMINISTRADOR) &&
-                !lawyer.getId().equals(user.getId())) {
-            throw new InsufficientPermissionsException();
-        }
-
-        lawyerRepository.delete(lawyer);
-    }
 }

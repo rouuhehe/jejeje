@@ -26,7 +26,7 @@ import lombok.Data;
 @Entity
 @Data
 @Builder
-public class ChatSession {
+public class ChatSession
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

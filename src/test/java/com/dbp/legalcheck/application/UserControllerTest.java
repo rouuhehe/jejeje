@@ -4,6 +4,7 @@ import com.dbp.legalcheck.PostgresTestContainersConfiguration;
 import com.dbp.legalcheck.common.enums.UserRole;
 import com.dbp.legalcheck.domain.user.User;
 import com.dbp.legalcheck.infrastructure.user.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,6 +35,11 @@ public class UserControllerTest {
     private UserRepository userRepository;
 
     private User user;
+
+    @BeforeEach
+    void setUp() {
+        userRepository.deleteAll();
+    }
 
     // Test de listUsers
     @Test
