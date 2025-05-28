@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class AiService {
     private final AiConfig config;
     private final ChatSessionService sessionService;
+    private final ChatCompletionsClient client;
 
     // POST /api/ai/chat/{id}
     public String generateResponse(User user, UUID sessionId, String prompt) {
@@ -39,17 +40,13 @@ public class AiService {
 
         List<ChatRequestMessage> messages = sessionService.getSessionMessages(user, sessionId, prompt);
 
-        ChatCompletionsClient client = new ChatCompletionsClientBuilder()
-                .credential(new AzureKeyCredential(config.getToken()))
-                .endpoint(config.getEndpoint())
-                .buildClient();
-
         ChatCompletionsOptions options = new ChatCompletionsOptions(messages);
         options.setModel(config.getModel());
         options.setMaxTokens(1024);
 
         ChatCompletions completions = client.complete(options);
-        String response = completions.getChoice().getMessage().getContent();
+        String response = completions.getChoices().get(0).getMessage().getContent();
+
 
         sessionService.saveMessage(session, MessageRole.USUARIO, prompt);
         sessionService.saveMessage(session, MessageRole.ASISTENTE, response);
