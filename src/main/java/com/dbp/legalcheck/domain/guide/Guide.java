@@ -27,6 +27,8 @@ public class Guide {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+
+
     @ManyToOne
     @JoinColumn(nullable = false)
     private Lawyer author;
