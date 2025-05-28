@@ -23,6 +23,7 @@ public class EmailListener {
         Context context = new Context();
         context.setVariable("fullName", user.getFirstName() + " " + user.getLastName());
         context.setVariable("email", user.getEmail());
+        context.setVariable("verId", user.getVerificationId());
 
         emailService.sendSignInEmail(
                 user.getEmail(),
