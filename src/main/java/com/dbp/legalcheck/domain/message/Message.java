@@ -6,8 +6,6 @@ import java.util.UUID;
 import com.dbp.legalcheck.common.enums.MessageRole;
 import com.dbp.legalcheck.domain.chatSession.ChatSession;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
@@ -19,8 +17,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -40,16 +40,8 @@ public class Message {
     private MessageRole role;
 
     @CreationTimestamp
-    @Column(updatable = false, nullable = false)
     private Instant createdAt;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
-
-    public Message(ChatSession session, MessageRole role, String content, Instant createdAt) {
-        this.session = session;
-        this.role = role;
-        this.content = content;
-        this.createdAt = createdAt;
-    }
 }

@@ -5,7 +5,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class UnauthorizedException extends ResponseStatusException {
     public UnauthorizedException() {
-        this("Unauthorized");
+        this("Authorization failed");
     }
 
     public UnauthorizedException(String message) {

@@ -19,4 +19,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, e.getStatusCode());
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionDTO> handleGenericException(Exception e) {
+        ExceptionDTO response = new ExceptionDTO();
+        response.setStatus(500);
+        response.setMessage("Unexpected internal error occurred.");
+
+        e.printStackTrace();
+
+        return ResponseEntity.internalServerError().body(response);
+    }
+
 }

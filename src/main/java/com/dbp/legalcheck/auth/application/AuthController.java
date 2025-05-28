@@ -9,12 +9,10 @@ import com.dbp.legalcheck.dto.user.RegisterUserDTO;
 import com.dbp.legalcheck.dto.user.UserResponseDTO;
 import com.dbp.legalcheck.dto.user.VerifyResendDTO;
 import com.dbp.legalcheck.dto.user.VerifyUserDTO;
-import com.dbp.legalcheck.event.SignInEmailEvent;
 import com.dbp.legalcheck.exception.user.UserAlreadyVerifiedException;
 import com.dbp.legalcheck.exception.user.UserNotFoundException;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +30,6 @@ public class AuthController {
     private final AuthenticationService authenticationService;
     private final UserService userService;
     private final ModelMapper modelMapper;
-    private final ApplicationEventPublisher eventPublisher;
 
     @PostMapping("/login")
     public AuthResponseDTO login(@Valid @RequestBody AuthLoginDTO request) {
@@ -42,14 +39,14 @@ public class AuthController {
     @PostMapping("/register")
     public UserResponseDTO register(@Valid @RequestBody RegisterUserDTO request) {
         User createdUser = userService.createUser(request);
-
+        // TODO: trigger send email event
         return modelMapper.map(createdUser, UserResponseDTO.class);
     }
 
     @PostMapping("/verify")
     public UserResponseDTO verifyUser(@Valid @RequestBody VerifyUserDTO request) {
         User user = authenticationService.verifyUser(request.getVerificationId());
-
+        // TODO: trigger welcome email event
         UserResponseDTO response = modelMapper.map(user, UserResponseDTO.class);
         response.setVerified(true);
         return response;
@@ -65,7 +62,7 @@ public class AuthController {
             throw new UserAlreadyVerifiedException();
         }
 
-        eventPublisher.publishEvent(new SignInEmailEvent(user));
+        // TODO: trigger send email event
     }
 
 }

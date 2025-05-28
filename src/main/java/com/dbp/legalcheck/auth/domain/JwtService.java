@@ -5,9 +5,9 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.function.Function;
 
-import com.dbp.legalcheck.common.exception.UnauthorizedException;
 import com.dbp.legalcheck.domain.user.User;
 import com.dbp.legalcheck.domain.user.UserService;
+import com.dbp.legalcheck.common.exception.UnauthorizedException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,7 +32,7 @@ public class JwtService {
 
     public String generateToken(User user) {
         return Jwts.builder()
-                .setSubject(user.getUsername())
+                .setSubject(user.getId().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)

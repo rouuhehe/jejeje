@@ -13,6 +13,8 @@ import com.dbp.legalcheck.common.enums.ChatSessionStatus;
 import com.dbp.legalcheck.common.enums.MessageRole;
 import com.dbp.legalcheck.domain.message.Message;
 import com.dbp.legalcheck.domain.user.User;
+import com.dbp.legalcheck.dto.chatSession.SessionResponseDTO;
+import com.dbp.legalcheck.dto.message.MessageResponseDTO;
 import com.dbp.legalcheck.exception.chatSession.SessionNoOwnerException;
 import com.dbp.legalcheck.exception.chatSession.SessionNotFoundException;
 import com.dbp.legalcheck.infrastructure.chatSession.ChatSessionRepository;
@@ -41,7 +43,7 @@ public class ChatSessionService {
                 .build());
     }
 
-    public List<Message> listMessagesBySession(UUID sessionId, User user) {
+    public List<MessageResponseDTO> listMessagesBySession(UUID sessionId, User user) {
         ChatSession session = getSessionById(sessionId)
                 .orElseThrow(SessionNotFoundException::new);
 
@@ -49,26 +51,26 @@ public class ChatSessionService {
             throw new SessionNoOwnerException();
         }
 
-        return listSessionHistory(session);
+        return listSessionHistory(session)
+                .stream().map(MessageResponseDTO::new).toList();
     }
 
-    public ChatSession getOrCreateSession(User user, UUID sessionId) {
-        Optional<ChatSession> session = sessionRepository.findById(sessionId);
-        if (session.isPresent()) {
-            return session.get();
-        }
-
-        ChatSession newSession = sessionRepository.save(ChatSession
+    public ChatSession createSession(User user) {
+        // TODO: trigger session created event
+        return sessionRepository.save(ChatSession
                 .builder()
                 .user(user)
                 .status(ChatSessionStatus.OPEN)
                 .build());
-        // TODO: trigger session created event
-        return newSession;
+    }
+
+    public ChatSession getSession(User user, UUID sessionId) {
+        return sessionRepository.findById(sessionId)
+                .orElseThrow(SessionNotFoundException::new);
     }
 
     public List<ChatRequestMessage> getSessionMessages(User user, UUID sessionId, String newPrompt) {
-        ChatSession session = getOrCreateSession(user, sessionId);
+        ChatSession session = getSession(user, sessionId);
         List<Message> history = listSessionHistory(session);
         List<ChatRequestMessage> messages = new ArrayList<>();
 
@@ -91,8 +93,9 @@ public class ChatSessionService {
         return messages;
     }
 
-    public List<ChatSession> getSessionsByUser(User user) {
-        return sessionRepository.findByUser(user);
+    public List<SessionResponseDTO> getSessionsByUser(User user) {
+        return sessionRepository.findByUser(user)
+                .stream().map(SessionResponseDTO::new).toList();
     }
 
     public Optional<ChatSession> getSessionById(UUID id) {
