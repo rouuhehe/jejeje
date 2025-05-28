@@ -6,6 +6,8 @@ import java.util.UUID;
 import com.dbp.legalcheck.common.enums.MessageRole;
 import com.dbp.legalcheck.domain.chatSession.ChatSession;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
@@ -23,6 +25,8 @@ import lombok.Data;
 @Entity
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -36,6 +40,7 @@ public class Message {
     private MessageRole role;
 
     @CreationTimestamp
+    @Column(updatable = false, nullable = false)
     private Instant createdAt;
 
     @Column(columnDefinition = "TEXT", nullable = false)
