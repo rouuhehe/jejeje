@@ -1,4 +1,4 @@
-package com.dbp.legalcheck.service;
+package com.dbp.legalcheck.domain.user;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -7,8 +7,6 @@ import java.util.*;
 
 import com.dbp.legalcheck.common.enums.UserRole;
 import com.dbp.legalcheck.domain.email.EmailApplicationService;
-import com.dbp.legalcheck.domain.user.User;
-import com.dbp.legalcheck.domain.user.UserService;
 import com.dbp.legalcheck.dto.user.RegisterUserDTO;
 import com.dbp.legalcheck.dto.user.ListedUserDTO;
 import com.dbp.legalcheck.exception.user.EmailConflictException;
