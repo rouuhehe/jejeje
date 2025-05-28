@@ -5,8 +5,9 @@ import java.util.UUID;
 
 import com.dbp.legalcheck.domain.ai.AiService;
 import com.dbp.legalcheck.domain.chatSession.ChatSession;
-import com.dbp.legalcheck.domain.message.Message;
 import com.dbp.legalcheck.domain.user.User;
+import com.dbp.legalcheck.dto.chatSession.SessionResponseDTO;
+import com.dbp.legalcheck.dto.message.MessageResponseDTO;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,7 +28,13 @@ public class AiController {
     private final AiService aiService;
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/chat/{sessionId}")
+    @PostMapping("/chat/session/create")
+    public ChatSession chat(@AuthenticationPrincipal User user) {
+        return aiService.createSession(user);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/chat/message/{sessionId}")
     public String chat(@AuthenticationPrincipal User user,
             @PathVariable UUID sessionId, @RequestBody String prompt) {
         return aiService.generateResponse(user, sessionId, prompt) + "\n";
@@ -35,13 +42,14 @@ public class AiController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/sessions")
-    public List<ChatSession> listSessions(@AuthenticationPrincipal User user) {
+    public List<SessionResponseDTO> listSessions(@AuthenticationPrincipal User user) {
         return aiService.listSessions(user);
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/sessions/{id}")
-    public List<Message> listSessionMessages(@PathVariable UUID id, @AuthenticationPrincipal User currentUser) {
+    public List<MessageResponseDTO> listSessionMessages(@PathVariable UUID id,
+            @AuthenticationPrincipal User currentUser) {
         return aiService.listSessionMessages(id, currentUser);
     }
 
