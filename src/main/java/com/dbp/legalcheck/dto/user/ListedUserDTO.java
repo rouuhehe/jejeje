@@ -7,8 +7,10 @@ import com.dbp.legalcheck.common.enums.UserRole;
 import com.dbp.legalcheck.domain.user.User;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ListedUserDTO {
     private UUID id;
     private String firstName;
