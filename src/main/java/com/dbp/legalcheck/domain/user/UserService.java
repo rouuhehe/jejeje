@@ -44,6 +44,7 @@ public class UserService {
 
     public User verifyUser(User user) {
         user.setVerificationId(null);
+        emailService.sendWelcomeEmail(user);
         return userRepository.save(user);
     }
 
